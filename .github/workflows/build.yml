@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies (packages)
         run: |
           sudo /usr/local/bin/pip3 install jsonschema jinja2
-          brew install make autoconf automake pkg-config gnu-sed gettext
+          brew install make autoconf automake libtool pkg-config gnu-sed gettext
           sudo rm -rf /usr/local/Frameworks/Python*
           curl -LO https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_macosx_x86_64
           sudo install -m755 ldid_macosx_x86_64 /usr/local/bin/ldid
@@ -98,6 +98,7 @@ jobs:
           echo "CXXFLAGS_FOR_BUILD=-stdlib=libc++ -arch $(uname -m) -isysroot $(xcrun -sdk macosx --show-sdk-path) -Os" >> $GITHUB_ENV
           echo "CPPFLAGS_FOR_BUILD=-arch $(uname -m) -isysroot $(xcrun -sdk macosx --show-sdk-path) -Wno-error-implicit-function-declaration -Os" >> $GITHUB_ENV
           echo "LDFLAGS_FOR_BUILD=-Wl,-dead_strip" >> $GITHUB_ENV
+          echo "ACLOCAL_PATH=$(brew --prefix libtool)/share/aclocal" >> $GITHUB_ENV
           mkdir -p $(pwd)/sysroot/usr/local/lib
           ln -sf $(pwd)/sysroot/usr/local/lib{,64}
 
@@ -190,6 +191,8 @@ jobs:
       - name: Build popt
         run: |
           cd popt-popt-${{ env.POPT_VERSION }}-release
+          export ACLOCAL_PATH="$(brew --prefix libtool)/share/aclocal:${ACLOCAL_PATH}"
+          glibtoolize --force --copy
           autoreconf -fiv
           ./configure \
             ${{ env.CONFIGURE_ARGS }} \
