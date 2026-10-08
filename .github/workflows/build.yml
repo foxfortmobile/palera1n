@@ -37,6 +37,11 @@ jobs:
       SLANG_VERSION: 2.3.3
       NEWT_VERSION: 0.52.23
       POPT_VERSION: 1.19
+      LIBIMOBILEDEVICE_COMMIT: ed0d66d0341562731bb19928dfe48155509fa7a7
+      LIBIRECOVERY_COMMIT: 7ce02c347b7c26e59498e6af31c9da51018d0fa1
+      LIBIMOBILEDEVICE_GLUE_COMMIT: 362f7848ac89b74d9dd113b38b51ecb601f76094
+      LIBPLIST_COMMIT: 2117b8fdb6b4096455bd2041a63e59a028120136
+      LIBUSBMUXD_COMMIT: a7f0543fb1ecb20ac7121c0fd77297200e0e43fc
 
     steps:
       - name: Checkout
@@ -75,6 +80,16 @@ jobs:
           git clone --depth=1 https://github.com/libimobiledevice/libirecovery
           git clone --depth=1 https://github.com/libimobiledevice/libusbmuxd
           git clone --depth=1 https://github.com/libimobiledevice/libimobiledevice
+          for spec in \
+            "libplist ${{ env.LIBPLIST_COMMIT }}" \
+            "libimobiledevice-glue ${{ env.LIBIMOBILEDEVICE_GLUE_COMMIT }}" \
+            "libirecovery ${{ env.LIBIRECOVERY_COMMIT }}" \
+            "libusbmuxd ${{ env.LIBUSBMUXD_COMMIT }}" \
+            "libimobiledevice ${{ env.LIBIMOBILEDEVICE_COMMIT }}"; do
+            set -- $spec
+            git -C "$1" fetch origin "$2"
+            git -C "$1" reset --hard "$2"
+          done
 
       - name: Select correct Xcode
         run: |
