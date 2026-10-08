@@ -19,8 +19,6 @@ on:
         - 'Makefile'
         - 'CMakeLists.txt'
         - '.github/workflows/build.yml'
-  schedule:
-    - cron: "0 0 * * 0"
   workflow_dispatch:
 
 jobs:
@@ -28,18 +26,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: x86_64
-            gnu_triple: x86_64-apple-darwin
-            os: macosx
-            minos: 10.8
           - arch: arm64
             gnu_triple: aarch64-apple-darwin
             os: macosx
             minos: 11.0
-          - arch: arm64
-            gnu_triple: aarch64-apple-darwin
-            os: iphoneos
-            minos: 7.0
     runs-on: macos-15
     env:
       MBEDTLS_VERSION: 3.4.0
@@ -88,7 +78,7 @@ jobs:
 
       - name: Select correct Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.2.app
+          sudo xcode-select -s /Applications/Xcode_16.4.app
 
       - name: Setup environment
         run: |
@@ -301,14 +291,6 @@ jobs:
         id: branch-name
         uses: tj-actions/branch-names@v7
 
-      - name: Upload Latest Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: iso
-          path: |
-            ready/palera1n-macosx-universal
-            retention-days: 90
-
       - name: Upload ${{ matrix.os }} thin ${{ matrix.arch }} build
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v4
@@ -326,6 +308,7 @@ jobs:
           retention-days: 90
 
   build-Linux:
+    if: ${{ false }}
     strategy:
       matrix:
         triple:
